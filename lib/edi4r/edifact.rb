@@ -1,4 +1,3 @@
-# encoding: US-ASCII
 # UN/EDIFACT add-ons to EDI module,
 # API to parse and create UN/EDIFACT data
 #
