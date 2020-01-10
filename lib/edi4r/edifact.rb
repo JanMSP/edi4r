@@ -66,6 +66,7 @@ module EDI::E
   Illegal_Charset_Patterns = Hash.new(/[^-A-Za-z0-9 .,()\/=!%"&*;<>'+:?\xa0-\xff]+/)
   Illegal_Charset_Patterns['UNOA'] =     /[^-A-Z0-9 .,()\/=!%"&*;<>'+:?]+/
   Illegal_Charset_Patterns['UNOB'] =  /[^-A-Za-z0-9 .,()\/=!%"&*;<>'+:?]+/
+  Illegal_Charset_Patterns['UNOW'] =  /[^-A-Za-z0-9 .,()\/=!%"&*;<>'+:?\u{00}-\u{10ffff}}]+/
   # more to come...
 
   #########################################################################
@@ -813,7 +814,7 @@ module EDI::E
         end
       when 4
         # A,B: ISO 646 subsets, C-K: ISO-8859-x, X: ISO 2022, Y: ISO 10646-1
-        if not @charset =~ /UNO[A-KXY]/
+        if not @charset =~ /UNO[A-KWXY]/
           raise "Syntax version 4 permits only charsets UNOA...UNOZ!"
         end
       else
