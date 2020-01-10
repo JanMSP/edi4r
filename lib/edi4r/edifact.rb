@@ -64,8 +64,8 @@ module EDI::E
   # Use pattern for allowed chars of UNOC charset if none given explicitly
   #
   Illegal_Charset_Patterns = Hash.new(/[^-A-Za-z0-9 .,()\/=!%"&*;<>'+:?\xa0-\xff]+/n)
-  Illegal_Charset_Patterns['UNOA'] =     /[^-A-Z0-9 .,()\/=!%"&*;<>'+:?]+/u
-  Illegal_Charset_Patterns['UNOB'] =  /[^-A-Za-z0-9 .,()\/=!%"&*;<>'+:?]+/u
+  Illegal_Charset_Patterns['UNOA'] =     /[^-A-Z0-9 .,()\/=!%"&*;<>'+:?]+/
+  Illegal_Charset_Patterns['UNOB'] =  /[^-A-Za-z0-9 .,()\/=!%"&*;<>'+:?]+/
   Illegal_Charset_Patterns['UNOW'] =  /[^-A-Za-z0-9 .,()\/=!%"&*;<>'+:?\u{00}-\u{10ffff}}]+/
   # more to come...
 
@@ -823,7 +823,7 @@ module EDI::E
       if @e_iedi and @version != 4
         raise "Inconsistent parameters - I-EDI requires syntax version 4!"
       end
-      @illegal_charset_pattern = Illegal_Charset_Patterns['@version']
+      @illegal_charset_pattern = Illegal_Charset_Patterns[@charset]
       # Add more rules ...
     end
 
