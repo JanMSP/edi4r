@@ -517,10 +517,10 @@ module EDI
       when /^(UNA......)?\r?\n?U[IN]B.UNO[A-Z].[1-4]/: 'E'  # UN/EDIFACT
       when /^EDI_DC/: 'I'  # SAP IDoc
       when re : 'X'+$3     # XML, Doctype = Interchange, syntax standard key (E, I, ...) postfix
-      when /^\037\213/: 'GZ' # gzip
-      when /^\037\235/: 'Z'  # compress
+      when /^\037\213/n: 'GZ' # gzip
+      when /^\037\235/n: 'Z'  # compress
       when /^\037\036/: 'z'  # pack
-      when /^BZh[0-\377]/:  'BZ' # bzip2
+      when /^BZh[0-\377]/n:  'BZ' # bzip2
       else; "?? (stream starts with: #{buf[0..15]})"
       end
     end
