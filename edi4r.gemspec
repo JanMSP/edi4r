@@ -4,7 +4,7 @@ $:.push File.expand_path("../lib", __FILE__)
 Gem::Specification.new do |spec|
   spec.name        = "edi4r"
   spec.version     = File.read('VERSION')
-  spec.authors     = ["Mark John Buenconsejo"]
+  spec.authors     = ["Mark John Buenconsejo", "Jan Petersen"]
   spec.email       = ["mjwork@simpleteq.com"]
   spec.homepage    = "http://markjeee.com"
   spec.summary     = "edi4r"
