@@ -197,8 +197,8 @@ module EDI::E
 
     alias to_s_orig to_s
 
-    def to_s
-      return to_s_orig unless @format
+    def to_s(*args)
+      return to_s_orig(*args) unless @format
       case @format.to_s
       when '101'
         "%02d%02d%02d" % [year % 100, mon, day]
