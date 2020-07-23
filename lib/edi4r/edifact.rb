@@ -746,7 +746,7 @@ module EDI::E
 
     # Returns the number of warnings found, writes warnings to STDERR
 
-    def validate( err_count=0 )
+    def validate( err_count=0, ignore_charset_consistency = false )
       if (h=self.size) != (t=@trailer.d0036)
         warn "Counter UNZ/UIZ, DE0036 does not match content: #{t} vs. #{h}"
         err_count += 1
@@ -759,7 +759,7 @@ module EDI::E
         warn "Syntax version UNZ/UIZ, S001/0002 mismatch: #{h} vs. #@version"
         err_count += 1
       end
-      check_consistencies
+      check_consistencies(ignore_charset_consistency)
 
       if is_iedi?
         if (t=@trailer.cS302.d0300) != (h=@header.cS302.d0300)
@@ -776,7 +776,7 @@ module EDI::E
 
       # FIXME: Check if messages/groups are uniquely numbered
 
-      super
+      super(err_count)
     end
 
     private
@@ -794,31 +794,37 @@ module EDI::E
     #
     # Private method: Check if basic UNB elements are set properly
     #
-    def check_consistencies
+    def check_consistencies(ignore_charset_check = false)
       # FIXME - @syntax should be completely avoided, use sub-module name
       if not ['E'].include?(@syntax) # More anticipated here
         raise "#{@syntax} - syntax not supported!"
       end
-      case @version
-      when 1
-        if @charset != 'UNOA'
-          raise "Syntax version 1 permits only charset UNOA!"
-        end
-      when 2
-        if not @charset =~ /UNO[AB]/
-          raise "Syntax version 2 permits only charsets UNOA, UNOB!"
-        end
-      when 3
-        if not @charset =~ /UNO[A-F]/
-          raise "Syntax version 3 permits only charsets UNOA...UNOF!"
-        end
-      when 4
-        # A,B: ISO 646 subsets, C-K: ISO-8859-x, X: ISO 2022, Y: ISO 10646-1
-        if not @charset =~ /UNO[A-KWXY]/
-          raise "Syntax version 4 permits only charsets UNOA...UNOZ!"
+      if ignore_charset_check
+        unless @version.in?(1..4)
+          raise "#{@version} - no such syntax version!"
         end
       else
-        raise "#{@version} - no such syntax version!"
+        case @version
+        when 1
+          if @charset != 'UNOA'
+            raise "Syntax version 1 permits only charset UNOA!"
+          end
+        when 2
+          if not @charset =~ /UNO[AB]/
+            raise "Syntax version 2 permits only charsets UNOA, UNOB!"
+          end
+        when 3
+          if not @charset =~ /UNO[A-F]/
+            raise "Syntax version 3 permits only charsets UNOA...UNOF!"
+          end
+        when 4
+          # A,B: ISO 646 subsets, C-K: ISO-8859-x, X: ISO 2022, Y: ISO 10646-1
+          if not @charset =~ /UNO[A-KWXY]/
+            raise "Syntax version 4 permits only charsets UNOA...UNOZ!"
+          end
+        else
+          raise "#{@version} - no such syntax version!"
+        end
       end
       if @e_iedi and @version != 4
         raise "Inconsistent parameters - I-EDI requires syntax version 4!"
