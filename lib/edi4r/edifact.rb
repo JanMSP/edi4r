@@ -369,7 +369,8 @@ module EDI::E
       :interchange_control_reference => '1', :application_reference => nil, 
       :interchange_agreement_id => nil,
       :acknowledgment_request => nil, :test_indicator => nil,
-      :output_mode => :verbatim
+      :output_mode => :verbatim,
+      :ignore_charset_consistency => false
     }
     @@interchange_default_keys = @@interchange_defaults.keys
 
@@ -414,6 +415,7 @@ module EDI::E
       par = @@interchange_defaults.merge( user_par )
 
       @messages_created = @groups_created = 0
+      @ignore_charset_consistency = par[:ignore_charset_consistency]
 
       @syntax = 'E' # par[:syntax]	# E = UN/EDIFACT
       @e_iedi = par[:i_edi]
@@ -746,7 +748,7 @@ module EDI::E
 
     # Returns the number of warnings found, writes warnings to STDERR
 
-    def validate( err_count=0, ignore_charset_consistency = false )
+    def validate( err_count=0 )
       if (h=self.size) != (t=@trailer.d0036)
         warn "Counter UNZ/UIZ, DE0036 does not match content: #{t} vs. #{h}"
         err_count += 1
@@ -759,7 +761,7 @@ module EDI::E
         warn "Syntax version UNZ/UIZ, S001/0002 mismatch: #{h} vs. #@version"
         err_count += 1
       end
-      check_consistencies(ignore_charset_consistency)
+      check_consistencies
 
       if is_iedi?
         if (t=@trailer.cS302.d0300) != (h=@header.cS302.d0300)
@@ -794,12 +796,12 @@ module EDI::E
     #
     # Private method: Check if basic UNB elements are set properly
     #
-    def check_consistencies(ignore_charset_check = false)
+    def check_consistencies
       # FIXME - @syntax should be completely avoided, use sub-module name
       if not ['E'].include?(@syntax) # More anticipated here
         raise "#{@syntax} - syntax not supported!"
       end
-      if ignore_charset_check
+      if @ignore_charset_consistency
         unless @version.in?(1..4)
           raise "#{@version} - no such syntax version!"
         end
